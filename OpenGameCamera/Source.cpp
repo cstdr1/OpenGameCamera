@@ -11,6 +11,7 @@
 // config data.  Change if you want different defaults
 namespace Settings {
 	bool enableFreeCam = false;
+	bool lockCam = false;
 	bool freezePlayer = true;
 	bool disableUi = true;
 	bool freezeTime = false;
@@ -65,6 +66,11 @@ void buildMainMenu(Menu &menu) {
 	elem3.value = &Settings::freezePlayer;
 	elem3.type = Element::ElementType::checkBox;
 
+	Element elem4;
+	elem4.text = "Freeze Cam [" + Keys::lockCam.name + "]";
+	elem4.value = &Settings::lockCam;
+	elem4.type = Element::ElementType::checkBox;
+
 	// checkbox for disabling the UI when the camera is enabled
 	Element elemDisableUi;
 	elemDisableUi.text = "Disable UI [" + Keys::disableUi.name + "]";
@@ -103,6 +109,7 @@ void buildMainMenu(Menu &menu) {
 	menu.elements.push_back(elem1);
 	menu.elements.push_back(elem2);
 	menu.elements.push_back(elem3);
+	menu.elements.push_back(elem4);
 	menu.elements.push_back(elemDisableUi);
 	menu.elements.push_back(elemFreeze);
 	menu.elements.push_back(elemFovP);
@@ -210,6 +217,15 @@ __int64 __fastcall hkupdateCamera2(CameraObject* a1, CameraObject* a2)
 	return oupdateCamera2(a1, a2);
 }
 
+// ViewAngleModification function
+void __fastcall hkViewAngleModFunc(float a1, void* a2, void* a3)
+{
+	if (Settings::lockCam) {
+		return;
+	}
+	oviewAngleModFunc(a1, a2, a3);
+}
+
 // keyboard hook function
 bool __fastcall hkkeyboardUpdate(__int64 a1, unsigned __int8 a2, __int64 a3)
 {
@@ -286,7 +302,10 @@ void drawLoop(Renderer* pRenderer, uint32_t width, uint32_t height) {
 	if (KeyMan::ReadKeyOnce(Keys::freezePlayer)) {
 		Settings::freezePlayer = !Settings::freezePlayer;
 	}
-
+	// read lockCam hotkey
+	if (KeyMan::ReadKeyOnce(Keys::lockCam)) {
+		Settings::lockCam = !Settings::lockCam;
+	}
 	// read disableUi hotkey
 	if (KeyMan::ReadKeyOnce(Keys::disableUi)) {
 		Settings::disableUi = !Settings::disableUi;
@@ -386,6 +405,7 @@ DWORD __stdcall mainThread(HMODULE hOwnModule)
 	std::cout << std::hex << "OFFSET_SETMOUSESTATE:\t0x" << StaticOffsets::Get_OFFSET_SETMOUSESTATE() << std::endl;
 	std::cout << std::hex << "OFFSET_POSTPROCESSSUB:\t0x" << StaticOffsets::Get_OFFSET_POSTPROCESSSUB() << std::endl;
 	std::cout << std::hex << "OFFSET_CAMERAHOOK2:\t0x" << StaticOffsets::Get_OFFSET_CAMERAHOOK2() << std::endl;
+	std::cout << std::hex << "OFFSET_VIEWANGLEMODFUNC:\t0x" << StaticOffsets::Get_OFFSET_VIEWANGLEMODFUNC() << std::endl;
 
 	// initialize the RenderView so we can correctly overwrite the camera location
 	g_RenderView = GameRenderer::GetInstance()->renderView;
@@ -403,6 +423,9 @@ DWORD __stdcall mainThread(HMODULE hOwnModule)
 	// hook the function where the mouse state is set
 	Candy::CreateHook(StaticOffsets::Get_OFFSET_SETMOUSESTATE(), &MouseManager::hkSetMouseState, &MouseManager::oSetMouseState);
 	
+	// hook the view angle modification function
+	Candy::CreateHook(StaticOffsets::Get_OFFSET_VIEWANGLEMODFUNC(), &hkViewAngleModFunc, &oviewAngleModFunc);
+
 	// hook the function that access GlobalPostProcessSettings
 	Candy::CreateHook(StaticOffsets::Get_OFFSET_POSTPROCESSSUB(), &hkglobalPostProcessSub, &oglobalPostProcessSub);
 	// initialize our renderer, call the drawLoop function once per game frame
@@ -432,6 +455,7 @@ DWORD __stdcall mainThread(HMODULE hOwnModule)
 			Candy::DestroyHook(StaticOffsets::Get_OFFSET_CAMERAHOOK2());
 			Candy::DestroyHook(StaticOffsets::Get_OFFSET_KEYBOARDUPDATE());
 			Candy::DestroyHook(StaticOffsets::Get_OFFSET_SETMOUSESTATE());
+			Candy::DestroyHook(StaticOffsets::Get_OFFSET_VIEWANGLEMODFUNC());
 			Candy::DestroyHook(StaticOffsets::Get_OFFSET_POSTPROCESSSUB());
 			// uninitialize minhook
 			MH_Uninitialize();

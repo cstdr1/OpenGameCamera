@@ -11,4 +11,7 @@ tupdateCamera2 oupdateCamera2 = nullptr;
 typedef bool(*__fastcall tkeyboardUpdate)(__int64, unsigned __int8, __int64);
 tkeyboardUpdate okeyboardUpdate = nullptr;
 
+typedef void(*__fastcall tviewAngleModFunc)(float, void*, void*);
+tviewAngleModFunc oviewAngleModFunc = nullptr;
+
 #endif

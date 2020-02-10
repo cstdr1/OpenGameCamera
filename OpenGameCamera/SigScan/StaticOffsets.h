@@ -35,6 +35,7 @@ public:
 	AddFuncCall(OFFSET_DRAWRECT2D, "[E8 ?? ?? ?? ?? C7 87 ?? ?? 00 00 37", PatternType::Address)
 	AddFuncCall(OFFSET_DRAWTEXT, "[E8 ?? ?? ?? ?? 83 C7 14 48 8D 76 04 4D 8D 76 08 49 83 ED 01", PatternType::Address)
 	AddFuncCall(OFFSET_CAMERAHOOK2, "[E8 ?? ?? ?? ?? 4C 8B 4C 24 28 41 0F B6 41 07", PatternType::Address)
+	AddFuncCall(OFFSET_VIEWANGLEMODFUNC, "4C 8B C7 48 8B D3 41 0F 28 C0 [E8 ?? ?? ?? ??", PatternType::Address)
 };
 
 // to-do: generate signatures for these

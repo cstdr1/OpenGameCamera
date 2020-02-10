@@ -16,6 +16,7 @@ public:
 	static KeyDef showMenuKey;
 	static KeyDef enableFreeCam;
 	static KeyDef freezePlayer;
+	static KeyDef lockCam;
 	static KeyDef recordCameraTrack;
 	static KeyDef speedUpCamera;
 	static KeyDef slowDownCamera;
