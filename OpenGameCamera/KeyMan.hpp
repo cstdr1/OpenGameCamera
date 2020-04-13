@@ -15,6 +15,7 @@ class Keys {
 public:
 	static KeyDef showMenuKey;
 	static KeyDef enableFreeCam;
+	static KeyDef lockView;
 	static KeyDef freezePlayer;
 	static KeyDef recordCameraTrack;
 	static KeyDef speedUpCamera;

@@ -77,6 +77,7 @@ time_t KeyMan::lastTime = clock();
 
 // key definitions for our preset keys
 KeyDef Keys::showMenuKey = { "HOME", VK_HOME };
+KeyDef Keys::lockView = { "F4", VK_F4 };
 KeyDef Keys::enableFreeCam = { "F5", VK_F5 };
 KeyDef Keys::freezePlayer = { "F6", VK_F6 };
 KeyDef Keys::speedUpCamera = { "SHIFT", VK_SHIFT };

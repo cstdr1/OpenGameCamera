@@ -12,9 +12,10 @@
 namespace Settings {
 	bool enableFreeCam = false;
 	bool disableUi = true;
-	bool cameraMenu = true;
-	bool dofMenu = true;
-	bool effectsMenu = true;
+	bool cameraMenu = false;
+	bool dofMenu = false;
+	bool effectsMenu = false;
+	bool debugMenu = false;
 	// Camera Settings
 	float evControl = 5.f;
 	float fov = 55;
@@ -40,6 +41,10 @@ namespace Settings {
 	bool forceBloomEnable = true;
 	bool ssrEnable = false;
 	bool ssrFullResEnable = false;
+	// Debug Menu
+	bool lockView = false;
+	bool fadeEnable = false;
+	bool blurEnable = false;
 }
 
 // global static variables
@@ -90,6 +95,11 @@ void buildMainMenu(Menu &menu) {
 	elemShowEffectsMenu.type = Element::ElementType::checkBox;
 	elemShowEffectsMenu.value = &Settings::effectsMenu;
 
+	Element elemDebugMenu;
+	elemDebugMenu.text = "Show Debug Menu";
+	elemDebugMenu.type = Element::ElementType::checkBox;
+	elemDebugMenu.value = &Settings::debugMenu;
+
 	// add them to the menu
 	menu.elements.push_back(elemShowMenu);
 	menu.elements.push_back(elemEnableFreecam);
@@ -97,6 +107,7 @@ void buildMainMenu(Menu &menu) {
 	menu.elements.push_back(elemCameraMenu);
 	menu.elements.push_back(elemShowDofMenu);
 	menu.elements.push_back(elemShowEffectsMenu);
+	menu.elements.push_back(elemDebugMenu);
 }
 
 void buildCameraMenu(Menu& menu) {
@@ -261,6 +272,30 @@ void buildEffectsMenu(Menu& menu) {
 
 }
 
+void buildDebugMenu(Menu& menu) {
+	menu.header.text = "Debug Menu";
+	menu.absolutePos.y += 800;
+
+	Element elemLockView;
+	elemLockView.text = "Lock View";
+	elemLockView.type = Element::ElementType::checkBox;
+	elemLockView.value = &Settings::lockView;
+
+	Element elemFadeEnable;
+	elemFadeEnable.text = "Fade Enable";
+	elemFadeEnable.type = Element::ElementType::checkBox;
+	elemFadeEnable.value = &Settings::fadeEnable;
+
+	Element elemBlurEnable;
+	elemBlurEnable.text = "Blur Enable";
+	elemBlurEnable.type = Element::ElementType::checkBox;
+	elemBlurEnable.value = &Settings::blurEnable;
+
+	menu.elements.push_back(elemLockView);
+	menu.elements.push_back(elemFadeEnable);
+	menu.elements.push_back(elemBlurEnable);
+}
+
 // Camera Update function
 __int64 __fastcall hkupdateCamera2(CameraObject* a1, CameraObject* a2)
 {
@@ -305,6 +340,7 @@ Menu mainMenu;
 Menu cameraMenu;
 Menu dofMenu;
 Menu effectsMenu;
+Menu debugMenu;
 
 void drawLoop(Renderer* pRenderer, uint32_t width, uint32_t height) {
 	if (g_PostProcess != nullptr && !g_origSSRValueSet) {
@@ -329,6 +365,7 @@ void drawLoop(Renderer* pRenderer, uint32_t width, uint32_t height) {
 		if (Settings::cameraMenu) cameraMenu.draw(pRenderer);
 		if (Settings::dofMenu) dofMenu.draw(pRenderer);
 		if (Settings::effectsMenu) effectsMenu.draw(pRenderer);
+		if (Settings::debugMenu) debugMenu.draw(pRenderer);
 	}
 
 	// Set resolution scale
@@ -381,6 +418,10 @@ void drawLoop(Renderer* pRenderer, uint32_t width, uint32_t height) {
 		Settings::disableUi = !Settings::disableUi;
 	}
 
+	if (KeyMan::ReadKeyOnce(Keys::lockView)) {
+		Settings::lockView = !Settings::lockView;
+	}
+
 	if (Settings::enableDof) {
 		if (g_PostProcess != nullptr) {
 			g_PostProcess->spriteDofEnable = true;
@@ -426,6 +467,10 @@ void drawLoop(Renderer* pRenderer, uint32_t width, uint32_t height) {
 
 	// Should the time be frozen?
 	GameTimeSettings::GetInstance()->timeScale = Settings::freezeTime ? 0.f : Settings::timeScale;
+
+	GameRenderer::GetInstance()->gameRenderSettings->BlurEnable = Settings::blurEnable;
+	GameRenderer::GetInstance()->gameRenderSettings->FadeEnable = Settings::fadeEnable;
+	GameRenderer::GetInstance()->gameRenderSettings->LockView = Settings::lockView;
 
 	// only process this stuff if the FreeCam is enabled
 	if (Settings::enableFreeCam) {
@@ -507,6 +552,8 @@ DWORD __stdcall mainThread(HMODULE hOwnModule)
 	buildCameraMenu(cameraMenu);
 	buildDofMenu(dofMenu);
 	buildEffectsMenu(effectsMenu);
+	buildDebugMenu(debugMenu);
+
 	// hook the function for setting our camera position manually
 	// TODO(cstdr1): camerahook is still broken, investigating 
 	Candy::CreateHook(StaticOffsets::Get_OFFSET_CAMERAHOOK2(), &hkupdateCamera2, &oupdateCamera2);

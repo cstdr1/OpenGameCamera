@@ -33,7 +33,21 @@ public:
 	float resolutionScale; //0x0028
 	char pad_002C[48]; //0x002C
 	float forceFov; //0x005C
-	char pad_0060[1000]; //0x0060
+	char pad_0060[192]; //0x0060
+	bool LockView; // 0x120
+	bool ResetLockedView; // 0x121
+	bool InfiniteProjectionMatrixEnable; // 0x122
+	bool SecondaryStreamingViewEnable; // 0x123
+	bool FadeEnable; // 0x124
+	bool FadeWaitingEnable; // 0x125
+	bool RenderPlanesEnable; // 0x126
+	bool RenderPlaneMainEnable; // 0x127
+	bool RenderPlaneOverlayEnable; // 0x128
+	bool DedicatedDebugTexture; // 0x129
+	bool RenderPlanesAutoDisable; // 0x12a
+	bool ColorBlindEnable; // 0x12b
+	bool RenderScaleResampleEnable; // 0x12c
+	bool BlurEnable; // 0x12d
 };
 
 class GlobalPostProcessSettings
