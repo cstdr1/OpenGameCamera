@@ -142,8 +142,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy /Y $(SolutionDir)x64\$(ConfigurationName)\OpenGameCamera.dll $(ProjectDir)
-wmic os get LocalDateTime &gt; $(ProjectDir)/BuildTimestamp.txt
+    <PreBuildEvent>xcopy /Y "$(SolutionDir)x64\$(ConfigurationName)\OpenGameCamera.dll" "$(ProjectDir)"
+wmic os get LocalDateTime &gt; "$(ProjectDir)/BuildTimestamp.txt"
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
